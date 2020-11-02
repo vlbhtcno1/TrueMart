@@ -8,6 +8,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TrueMart.Application.Common.Behaviors;
 using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 namespace TrueMart.Application
 {
@@ -18,7 +19,9 @@ namespace TrueMart.Application
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             services.AddMediatR(Assembly.GetExecutingAssembly());
-            
+
+            //Add Pipeline validator
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
 
             return services;
         }

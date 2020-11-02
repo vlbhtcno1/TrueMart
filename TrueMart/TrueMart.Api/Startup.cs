@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using TrueMart.Api.Filters;
 using TrueMart.Application;
 using TrueMart.Infrastructure;
 
@@ -27,7 +28,18 @@ namespace TrueMart.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers(config =>
+            {
+                config.Filters.Add(typeof(ApiExceptionFilter));
+            });
+            services.AddCors(action =>
+            {
+                action.AddPolicy("CORS", config =>
+                {
+                    config.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+                });
+            });
+
             services.AddApplication(Configuration);
             services.AddInfrastructure(Configuration);
         }
@@ -45,7 +57,7 @@ namespace TrueMart.Api
             app.UseRouting();
 
             app.UseAuthorization();
-
+            app.UseCors("CORS");
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
